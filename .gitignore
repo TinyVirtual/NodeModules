@@ -141,3 +141,26 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# test folders
+/Test/*
+*.test.*
+*.test
+
+# JSON DataBase
+/JsonDB/*
+
+# Private Files
+/private/*
+*.private.*
+*.private
+private.*
+
+# Error files
+error-*.txt
+*.err
+*.dump
+*error*.txt
+
+# Diffs
+/Diff/*
