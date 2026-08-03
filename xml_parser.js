@@ -1,4 +1,9 @@
 
+/**
+ * Escape a string with XAML encoding
+ * @param {String} str - String to escape
+ * @returns {String} - The escaped string
+ */
 function xmlEscape(str){
     return str.replaceAll('&','&amp;')
             .replaceAll('"','&quot;')
@@ -7,6 +12,11 @@ function xmlEscape(str){
             .replaceAll("'",'&apos;')
             
 }
+/**
+ * Unescape a string from XAML encoding
+ * @param {String} str - String to unescape
+ * @returns {String} - The unescaped string
+ */
 function xmlUnescape(str){
     return str.replaceAll('&amp;',"&")
             .replaceAll('&quot;','"')
@@ -24,12 +34,22 @@ function xmlUnescape(str){
 }
 
 class ParseError extends Error {
+    /**
+     * Makes a new ParseError
+     * @param {String} message - Error description
+     * @returns {ParseError} - The error
+     */
     constructor(message) {
         super(message);
         this.name = "ParseError";
     }
 }
 class GenericTextXmlTag {
+
+    /**
+     * Creates a new Generic XML text element
+     * @param {String} text - The text content
+     */
     constructor(text) {
         this.content = xmlUnescape(text)
         this.rawContent = text
@@ -39,6 +59,9 @@ class GenericTextXmlTag {
         this.textTag = ['','']
     }
 
+    /**
+     * Removes the parent of a element
+     */
     removeParent = function(){
         if(this.parent){
             this.parent.children = this.parent.children.filter(v=>v!=this)
@@ -46,6 +69,10 @@ class GenericTextXmlTag {
         }
     }
 
+    /**
+     * Turns element into a JSON compatible structure
+     * @returns {Object} - The JSON compatible structure
+     */
     toJsonStruc = function(){
         return {
             content: this.content,
@@ -53,13 +80,25 @@ class GenericTextXmlTag {
         }
     }
 
+    /**
+     * Turn this node into a XML String
+     * @param {Number} [depth] - The depth of current node
+     * @param {Number} [identation] - Ammount of identation
+     * @returns 
+     */
     toString = function(depth=0,identation=4){
         return (this.isRaw?(' ').repeat(((depth>0)?depth:0)*identation):'')+this.textTag[0]+this.rawContent+this.textTag[1]
     }
 }
 
 class XmlAttributes {
-    constructor(name,value) {
+
+    /**
+     * Creates a new XML Attribute object
+     * @param {String} name - The name of the attribute
+     * @param {String} [value] - The value of the tag
+     */
+    constructor(name,value="") {
         this.name = name
         this.value = value
     }
@@ -67,19 +106,35 @@ class XmlAttributes {
 
 
 class XmlTextNode extends GenericTextXmlTag {
-    constructor(sup) {
-        super(sup)
+
+    /**
+     * Creates a new XML text node
+     * @param {String} content - The text content 
+     */
+    constructor(content) {
+        super(content)
         this.type = 'TextNode'
     }
 }
 class XmlCDATA extends GenericTextXmlTag {
-    constructor(sup) {
-        super(sup)
+
+    /**
+     * Creates a new XML CDATA Element
+     * @param {String} content - The content of the CDATA code 
+     */
+    constructor(content) {
+        super(content)
         this.textTag = ['<![CDATA[',']]>']
         this.type = 'CDATA'
     }
 }
 class XmlEntity extends GenericTextXmlTag {
+
+    /**
+     * Creates a new XML entity node (Supports only basic single entities)
+     * @param {String} entity - The entity type 
+     * @param {String} value - The entity value 
+     */
     constructor(entity,value) {
         super(entity+' '+value)
         this.textTag = ['<!','>']
@@ -88,6 +143,11 @@ class XmlEntity extends GenericTextXmlTag {
         this.entity = entity
         this.value = value
     }
+
+    /**
+     * Turns element into a JSON compatible structure
+     * @returns {Object} - The JSON compatible structure
+     */
     toJsonStruc = function(){
         return {
             textElementType: this.type,
@@ -96,19 +156,36 @@ class XmlEntity extends GenericTextXmlTag {
         }
     }
 
+    /**
+     * Turn this node into a XML String
+     * @param {Number} [depth] - The depth of current node
+     * @param {Number} [identation] - Ammount of identation
+     * @returns 
+     */
     toString = function(depth=0,identation=4){
         return this.textTag[0]+this.entity+' '+this.value+this.textTag[1]
     }
 }
 
 class XmlComment extends GenericTextXmlTag {
-    constructor(sup) {
-        super(sup)
+
+    /**
+     * Creates a new XML Comment Element
+     * @param {String} comment - The content of the Comment Node 
+     */
+    constructor(comment) {
+        super(comment)
         this.textTag = ['<!--','-->']
         this.type = 'Comment'
     }
 }
 class XmlInstructions {
+
+    /**
+     * Creates a new XML Instruction Element
+     * @param {String} tag - The tag of the instruction
+     * @param {XmlAttributes[]} [attributes=[]] - The Attributes to add
+     */
     constructor(tag,attributes=[]) {
         this.textTag = ['<?','?>']
         this.type = 'Instructions'
