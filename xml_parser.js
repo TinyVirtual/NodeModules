@@ -194,12 +194,20 @@ class XmlInstructions {
         this.attributes = (attributes&&attributes.length)?[...attributes]:[]
     }
 
+    /**
+     * Removes the parent of a element
+     */
     removeParent = function(){
         if(this.parent){
             this.parent.children = this.parent.children.filter(v=>v!=this)
             this.parent = null
         }
     }
+
+    /**
+     * Turns element into a JSON compatible structure
+     * @returns {Object} - The JSON compatible structure
+     */
     toJsonStruc = function(){
         return {
             textElementType: this.type,
@@ -208,6 +216,12 @@ class XmlInstructions {
         }
     }
 
+    /**
+     * Turn this node into a XML String
+     * @param {Number} [depth] - The depth of current node
+     * @param {Number} [identation] - Ammount of identation
+     * @returns 
+     */
     toString = function(depth=0,identation=4){
         return this.textTag[0]+this.tag+(this.attributes.map(k=>' '+k.name+(k.value?('="'+xmlEscape(k.value)+'"'):"")).join(('')))
         +this.textTag[1]
@@ -215,6 +229,13 @@ class XmlInstructions {
 }
 
 class XmlElement {
+    /**
+     * Creates a new XML element
+     * @param {String} tag - the Tag of the element
+     * @param {XmlAttributes[]} [attributes] - The attributes of the element
+     * @param {XmlElement} [parent] - The parent of this element
+     * @param {XmlElement[]} [children] - All the child attached to this node
+     */
     constructor(tag,attributes=[],parent,children=[]) {
         this.tag = tag
         this.attributes = (attributes ?? []).length?[...attributes]:[]
@@ -232,12 +253,19 @@ class XmlElement {
             this.appendChild(...children)
         }
     }
-
+    /**
+     * Defines the parent of this node
+     * @param {XmlElement} parent 
+     */
     setParent = function(parent){
         this.removeParent()
         parent?.appendChild(this)
     }
 
+    /**
+     * Turns element into a JSON compatible structure
+     * @returns {Object} - The JSON compatible structure
+     */
     toJsonStruc = function(){
         return {
             tag: this.tag,
@@ -247,6 +275,12 @@ class XmlElement {
         }
     }
 
+    /**
+     * Turn this node into a XML String
+     * @param {Number} [depth] - The depth of current node
+     * @param {Number} [identation] - Ammount of identation
+     * @returns 
+     */
     toString = function(depth=0,identation=4){
         let m
 
@@ -287,12 +321,22 @@ class XmlElement {
         return m//.split('\n').filter(l=>Boolean(l.trim())).join('\n')+'\n'
     }
 
+    /**
+     * Appends and defines the parent of given nodes to this element
+     * @param  {...XmlElement} childs - The children nodes to append
+     */
     appendChild = function(...childs){
         childs.forEach(child=>{
             child.parent = this
             this.children.push(child)
         })
     }
+    /**
+     * Removes a children from the node
+     * @param {XmlElement} child - The children to remove
+     * @returns {XmlElement} - The removed element
+     */
+
     removeChild = function(child){
         child.parent = null
 
@@ -302,6 +346,13 @@ class XmlElement {
         }
         return l
     }
+    /**
+     * Removes all children with given callback or tag from a node
+     * @param {(condition: XmlElement) => Boolean|String} filter - 
+     *   - Funtion: The callback to compare the children in order to remove, will remove is condition is met.
+     *   - String: The tag name of the children to filter out.
+     * @returns {XmlElement[]} - Removed children
+     */
     clearChild = function(filter=(p=>true)){
         if(typeof filter == 'string'){
             let opl = filter
@@ -316,12 +367,20 @@ class XmlElement {
         }
         return removed
     }
+    /**
+     * Removes the parent of a element
+     */
     removeParent = function(){
         if(this.parent){
             this.parent.children = this.parent.children.filter(v=>v!=this)
             this.parent = null
         }
     }
+    /**
+     * Returns the first element with desired tag
+     * @param {String} tag - The element's tag to select
+     * @returns {XmlElement} - The element
+     */
     tagSelector = function(tag){
         if(!this.children.length){ return}
         let v = this.children.find(l=>l.tag==tag)
@@ -338,9 +397,19 @@ class XmlElement {
         }
         return v
     }
+    /**
+     * Select every attribute with tag name in this node, (WIP)
+     * @param {String} tag - The tag
+     * @returns {XmlAttributes[]}
+     */
     attributeSelector = function(tag){
         return this.attributes.find(l=>l.name==tag)
     }
+    /**
+     * Returns the every element with desired tag
+     * @param {String} tag - The element's tag to select
+     * @returns {XmlElement[]} - The matched elements
+     */
     tagSelectorAll = function(tag){
         let childs = [...this.children.filter(l=>l.tag==tag)]
 
@@ -351,6 +420,11 @@ class XmlElement {
         }
         return childs
     }
+    /**
+     * Returns the value of given attribute
+     * @param {String} attribute - The attribute name
+     * @returns {String|null} - The Attribute value or null if not found
+     */
     getAttribute = function(attribute){
         let myAtt = this.attributes.find(a=>a.name==(attribute+''))
         //console.log(this.attributes,attribute,myAtt)
@@ -359,6 +433,12 @@ class XmlElement {
         }
         return null
     }
+    /**
+     * Sets the attribute with value in this node
+     * @param {String} attribute - The attribute name
+     * @param {String} [value] - The attribute value
+     * @returns {XmlAttribute} - The attrbute setted
+     */
     setAttribute = function(attribute,value){
         let myAtt = this.attributes.findIndex(a=>a.name==(attribute+''))
         if(typeof value != 'string' && value != null){
@@ -373,26 +453,48 @@ class XmlElement {
             return att
         }
     }
+    /**
+     * Removes an attribute from this node
+     * @param {String} attribute - The name of the attribute to remove
+     * @returns {Boolean} - Returns ```true``` if the element was successfully removed
+     */
     removeAttribute = function(attribute){
         let myAtt = this.attributes.findIndex(a=>a.name==(attribute+''))
         if(myAtt!=-1){
             let oldVal = this.attributes[myAtt].value
             this.attributes = this.attributes.filter(x=>x.name!=(attribute+''))
-
+            return true
         } else {
             return false
         }
     }
+    /**
+     * Checks whether this element has given attribute or not
+     * @param {String} attribute - Attribute name to check
+     * @returns {Boolean} - ```true``` if the attribute exists
+     */
     hasAttribute = function(attribute){
         return !!this.attributes.find(a=>a.name==attribute)
     }
 }
 
 class HtmlElement extends XmlElement {
+    /**
+     * Creates a new HTML element, it's just like the XML element, but with a bit more flavour
+     * @param {String} tag - the Tag of the element
+     * @param {XmlAttributes[]} [attributes] - The attributes of the element
+     * @param {XmlElement} [parent] - The parent of this element
+     * @param {XmlElement[]} [children] - All the child attached to this node
+     */
     constructor(...sup){
         super(...sup)
     }
 
+    /**
+     * Gets the _(first)_ element with designed id
+     * @param {String} id - The id of the element
+     * @returns {XmlElement|HtmlElement} - The element
+     */
     getElementById = function(id){
         if(!this.children.length){ return}
         let v = this.children.find(l=>l.id==id)
@@ -409,23 +511,40 @@ class HtmlElement extends XmlElement {
         }
         return v
     }
-    getElementsByClass = function(clas){
-        let childs = [...this.children.filter(l=>l.classList.includes(clas))]
+    /**
+     * Returns an array of elements matching a class name
+     * @param {String} elementClass - The matching class name
+     * @returns {XmlElement[]|HtmlElement[]} A array of elements with that class
+     */
+    getElementsByClass = function(elementClass){
+        let childs = [...this.children.filter(l=>l.classList.includes(elementClass))]
 
         for(let c of this.children){
             if(typeof c.type !== "string"){
-                childs.push(...c.getElementsByClass(clas))
+                childs.push(...c.getElementsByClass(elementClass))
             }
         }
         return childs
     }
     classList = {
+        /**
+         * Add classes to the element
+         * @param  {...String} clases - The classes to add to this element
+         */
         add: function(...clases){
             this.attributes.setAttribute('class',(this.attributes.getAttribute('class')||"")+" "+clases.join(' '))
         },
+        /**
+         * Revoke classes from the element
+         * @param  {...String} clases - The classes to remove from this element
+         */
         remove: function(...clases){
             this.attributes.setAttribute('class',(this.attributes.getAttribute('class').split(' ').filter(l=>!clases.includes(l)).join(' ')))
         },
+        /**
+         * Defines the entire class list to a string of classes separated by spaces
+         * @param {String} value - The class list to set
+         */
         set: function(value){
             this.attributes.setAttribute('class',value)
         }
