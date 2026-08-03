@@ -481,10 +481,11 @@ class XmlElement {
 class HtmlElement extends XmlElement {
     /**
      * Creates a new HTML element, it's just like the XML element, but with a bit more flavour
-     * @param {String} tag - the Tag of the element
-     * @param {XmlAttributes[]} [attributes] - The attributes of the element
-     * @param {XmlElement} [parent] - The parent of this element
-     * @param {XmlElement[]} [children] - All the child attached to this node
+     * @param {...String|XmlAttributes[]|XmlElement|XmlElement[]} sup - 
+     *   @param {String} tag - the Tag of the element
+     *   @param {XmlAttributes[]} [attributes] - The attributes of the element
+     *   @param {XmlElement} [parent] - The parent of this element
+     *   @param {XmlElement[]} [children] - All the child attached to this node
      */
     constructor(...sup){
         super(...sup)
@@ -662,7 +663,6 @@ class XmlDocument {
         return childs
     }
 }
-
 
 function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
     let pover = 0
