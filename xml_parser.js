@@ -314,9 +314,6 @@ class XmlElement {
 class HtmlElement extends XmlElement {
     constructor(...sup){
         super(...sup)
-        this.classList = this.getAttribute('class')
-        this.id = this.getAttribute('id')
-        this.style = this.getAttribute('style')
     }
 
     getElementById = function(id){
@@ -344,6 +341,31 @@ class HtmlElement extends XmlElement {
             }
         }
         return childs
+    }
+    classList = {
+        add: function(...clases){
+            this.attributes.setAttribute('class',(this.attributes.getAttribute('class')||"")+" "+clases.join(' '))
+        },
+        remove: function(...clases){
+            this.attributes.setAttribute('class',(this.attributes.getAttribute('class').split(' ').filter(l=>!clases.includes(l)).join(' ')))
+        },
+        set: function(value){
+            this.attributes.setAttribute('class',value)
+        }
+    }
+
+    get id (){
+        return this.getAttribute('id')
+    }
+    set id (id){
+        this.setAttribute('id',id)
+    }
+
+    get style (){
+        return this.getAttribute('style')
+    }
+    set style (style){
+        this.setAttribute('style',style)
     }
 }
 
@@ -451,6 +473,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
     let depth = 0
     let elements = [], pilds = []
     let doc = new XmlDocument
+    let lastTag = ""
     let active = null
 
     let preserveBlank = !!settings.preserveBlank
@@ -677,6 +700,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
 
                 }
                 active = xml_elemt
+                lastTag = realTag
             } else {
                 let content = tag.splice(1).join('')
                 active = active.parent
