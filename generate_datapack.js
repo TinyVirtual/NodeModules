@@ -77,11 +77,24 @@ lkupqtBamboo
   .bamboo_mosaic
   .bamboo_mosaic_stairs = 1
 lkupqtBamboo
+  .bamboo_block
+  .bamboo_mosaic_stairs = 5
+lkupqtBamboo
+  .stripped_bamboo_block
+  .bamboo_mosaic_stairs = 5
+
+lkupqtBamboo
   .bamboo_planks
   .bamboo_mosaic_slab = 2
 lkupqtBamboo
   .bamboo_mosaic
   .bamboo_mosaic_slab = 2
+lkupqtBamboo
+  .stripped_bamboo_block
+  .bamboo_mosaic_slab = 8
+lkupqtBamboo
+  .bamboo_block
+  .bamboo_mosaic_slab = 8
 
 let woodtypes = "oak,spruce,birch,jungle,acacia,dark_oak,mangrove,cherry,pale_oak,poplar".split(",");
 let stemtypes = ["crimson","warped"];
