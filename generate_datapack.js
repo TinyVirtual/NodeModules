@@ -21,79 +21,57 @@ let lkupqt = {
     $_button:16
   }
 }
+let w = { ...lkupqt.$_wood }, p = { ...lkupqt.$_planks }
 
-lkupqt.stripped_$_wood = { ...lkupqt.$_wood };
-lkupqt.$_log =  { ...lkupqt.$_wood };
-lkupqt.stripped_$_log =  { ...lkupqt.$_wood };
+lkupqt.stripped_$_wood = { ...w };
+lkupqt.$_log =  { ...w };
+lkupqt.stripped_$_log =  { ...w };
 
 let lkupqtNether = {
-  $_stem:  { ...lkupqt.$_wood },
-  stripped_$_stem:  { ...lkupqt.$_wood },
-  $_hyphae:  { ...lkupqt.$_wood },
-  stripped_$_hyphae:  { ...lkupqt.$_wood },
+  $_stem:  { ...w },
+  stripped_$_stem:  { ...w },
+  $_hyphae:  { ...w },
+  stripped_$_hyphae:  { ...w },
+  $_planks: { ...p }
 }
 
 let lkupqtBamboo = {
-    bamboo_block: { ...lkupqt.$_wood },
-    stripped_bamboo_block: { ...lkupqt.$_wood },
-    bamboo_planks: { ...lkupqt.$_planks },
-    bamboo_mosaic: { ...lkupqt.$_planks },
+    bamboo_block: { ...w },
+    stripped_bamboo_block: { ...w },
+    bamboo_planks: { ...p },
+    bamboo_mosaic: { ...p },
 }
+let $w = "$_wood", $sw = "stripped_$_wood", $p = "$_planks", $l = "$_log", $sl = "stripped_$_log", $s = "$_stem", $ss = "stripped_$_stem", $h = "$_hyphae", $sh = "stripped_$_hyphae"
 
-lkupqt.
-  $_wood.
-  stripped_$_wood = 1
-lkupqt.
-  $_log.
-  stripped_$_log = 1
-lkupqtNether
-  .$_stem.
-  stripped_$_stem = 1
-lkupqtNether
-  .$_hyphae
-  .stripped_$_hyphae = 1
+lkupqt[$w][$sw] = 1
+lkupqt[$l][$sl] = 1
+lkupqtNether[$s][$ss] = 1
+lkupqtNether[$h][$sh] = 1
 
+let $bb = "bamboo_block", $sbb = "stripped_bamboo_block", $bp = "bamboo_planks", $bm = "bamboo_mosaic"
 
-lkupqtBamboo
-  .bamboo_block
-  .stripped_bamboo_block = 1
-lkupqtBamboo
-  .bamboo_block
-  .bamboo_mosaic = 4
-lkupqtBamboo
-  .stripped_bamboo_block
-  .bamboo_mosaic = 4
-lkupqtBamboo
-  .bamboo_planks
-  .bamboo_mosaic = 1
-lkupqtBamboo
-  .bamboo_mosaic
-  .bamboo_planks = 1
+lkupqtBamboo[$bb][$sbb] = 1
+lkupqtBamboo[$bb][$bm] = 4
+lkupqtBamboo[$sbb][$bm] = 4
+lkupqtBamboo[$bp][$bm] = 1
+lkupqtBamboo[$bm][$bp] = 1
 
-lkupqtBamboo
-  .bamboo_planks
+lkupqtBamboo[$bp]
   .bamboo_mosaic_stairs = 1
-lkupqtBamboo
-  .bamboo_mosaic
+lkupqtBamboo[$bm]
   .bamboo_mosaic_stairs = 1
-lkupqtBamboo
-  .bamboo_block
+lkupqtBamboo[$bb]
   .bamboo_mosaic_stairs = 5
-lkupqtBamboo
-  .stripped_bamboo_block
+lkupqtBamboo[$sbb]
   .bamboo_mosaic_stairs = 5
 
-lkupqtBamboo
-  .bamboo_planks
+lkupqtBamboo[$bp]
   .bamboo_mosaic_slab = 2
-lkupqtBamboo
-  .bamboo_mosaic
+lkupqtBamboo[$bm]
   .bamboo_mosaic_slab = 2
-lkupqtBamboo
-  .stripped_bamboo_block
+lkupqtBamboo[$sbb]
   .bamboo_mosaic_slab = 8
-lkupqtBamboo
-  .bamboo_block
+lkupqtBamboo[$bb]
   .bamboo_mosaic_slab = 8
 
 let woodtypes = "oak,spruce,birch,jungle,acacia,dark_oak,mangrove,cherry,pale_oak,poplar".split(",");
@@ -105,51 +83,30 @@ fs.writeFileSync("./datapack/pack.mcmeta",JSON.stringify({
   pack:{
     description:"Adds recipes for wood variants to the stonecutter.",
     min_format:[88,0],max_format:[133,0]
-  }},undefined,2))
+  }},void 0,2))
 
-for(let wood of woodtypes){
-  for(let input of Object.keys(lkupqt)){
-    for(let output of Object.keys(lkupqt[input])){
+function makeRecipe(wood, table){
+  for(let input of Object.keys(table)){
+    for(let output of Object.keys(table[input])){
       
       fs.writeFileSync("./datapack/data/stonecutter_cuts_wood/recipe/"+input.replaceAll("$",wood)+"_to_"+output.replaceAll("$",wood)+".json", JSON.stringify({
         type: "minecraft:stonecutting",
         ingredient: "minecraft:"+input.replaceAll("$",wood),
         result:{
           id: "minecraft:"+output.replaceAll("$",wood),
-          count: lkupqt[input][output]
+          count: table[input][output]
         }
-      },undefined,2))
+      },void 0,2))
     }
   }
+}
+
+for(let wood of woodtypes){
+  makeRecipe(wood, lkupqt)
 }
 
 for(let stem of stemtypes){
-  for(let input of Object.keys(lkupqtNether)){
-    for(let output of Object.keys(lkupqtNether[input])){
-      
-      fs.writeFileSync("./datapack/data/stonecutter_cuts_wood/recipe/"+input.replaceAll("$",stem)+"_to_"+output.replaceAll("$",stem)+".json", JSON.stringify({
-        type: "minecraft:stonecutting",
-        ingredient: "minecraft:"+input.replaceAll("$",stem),
-        result:{
-          id: "minecraft:"+output.replaceAll("$",stem),
-          count: lkupqtNether[input][output]
-        }
-      },undefined,2))
-    }
-  }
+  makeRecipe(stem, lkupqtNether)
 }
 
-let bamboo = "bamboo";
-for(let input of Object.keys(lkupqtBamboo)){
-  for(let output of Object.keys(lkupqtBamboo[input])){
-      
-      fs.writeFileSync("./datapack/data/stonecutter_cuts_wood/recipe/"+input.replaceAll("$",bamboo)+"_to_"+output.replaceAll("$",bamboo)+".json", JSON.stringify({
-        type: "minecraft:stonecutting",
-        ingredient: "minecraft:"+input.replaceAll("$",bamboo),
-        result:{
-          id: "minecraft:"+output.replaceAll("$",bamboo),
-          count: lkupqtBamboo[input][output]
-        }
-    },undefined,2))
-  }
-}
+makeRecipe("bamboo", lkupqtBamboo)
