@@ -1,4 +1,20 @@
-
+/*! 
+ * @preserve
+ * xml_parser.js by TinyVirtual; 
+ * All Rights Reserved; 
+ * Version: v0.2.4a (prealpha); 
+ * Git @ https://github.com/TinyVirtual/NodeModules.git;
+ * See repo for more details;
+ * Please credit if u liek cookie :3
+*/
+/*
+ * xml_parser.js@0.2.4a by TinyVirtual
+ * This is the unminified version of the file
+ * Merge requests are always welcome (if we have)
+ * Notice: this still needs to be written
+ * If you want to fork this project and make your own version, please give credits to original version 
+ * ...
+*/
 /**
  * Escape a string with XAML encoding
  * @param {String} str - String to escape
