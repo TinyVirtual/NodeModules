@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root>
+    <val>
+        <!-- This person has logged on recently -->
+        <name>Sarah</name>
+        <age>19</age>
+        <money>
+            <currency type="dollar">78</currency>
+            <currency type="euro">2</currency>
+        </money>
+        <friends>
+            <friend name="Luca"/>
+            <friend name="Jake"/>
+            <friend name="Isabelle"/>
+        </friends>
+    </val>
+    <val>
+        <!-- This person hasn't logged on in 28 months -->
+        <name>Luca</name>
+        <age>21</age>
+        <money>
+            <currency type="dollar">112</currency>
+            <currency type="euro">0.8</currency>
+            <!-- Money purse has been deactivated -->
+        </money>
+        <friends>
+            <friend name="Sarah"/>
+            <friend name="Jake"/>
+            <friend name="Isabelle"/>
+            <friend name="Gabriel"/>
+        </friends>
+    </val>
+</root>
