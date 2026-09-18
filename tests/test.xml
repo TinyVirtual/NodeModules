@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE xml>
+<!-- No full support to entities btw -->
+
+<root xmlns="https://w3c.com/xmlns">
+    <ns:Top ns:attribute="true" empty-attribute>
+        <self-closing with-attributes="&quot;Maybe&quot;"/>
+    </ns:Top>
+    <nested>
+        <a>
+            <b>
+                <c>
+                    <d>
+                        <![CDATA[
+                        This is CDATA
+                        <f>
+                            this is not an element... right?
+                        </f>
+                        ]]>
+                    </d>
+                </c>
+                <c>
+
+
+
+                    <!-- This is a comment, not an element -->
+                    This is a text, with &lt;notags&gt;&lt;/notags&gt;
+                </c>
+            </b>
+        </a>
+    </nested>
+    <multiline-attributes _idk="abc
+123
+xyz" tab="	a	b	c	d" spaces="   3   spaces   each   extreme   "/>
+
+
+
+                                        <span>Super far away</span>
+    <val>
+        <name>Sarah</name>
+        <age>19</age>
+        <money>
+            <currency type="dollar">78</currency>
+            <currency type="euro">2</currency>
+        </money>
+        <friends>
+            <friend name="Luca"/>
+            <friend name="Jake"/>
+            <friend name="Isabelle"/>
+        </friends>
+    </val>
+</root>
+
+<EOF file="end"/>
