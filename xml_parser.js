@@ -1,19 +1,15 @@
+/**
+ * @license MIT
+ * Copyright (c) 2026 TinyVirtual
+ * SPDX-License-Identifier: MIT
+ */
 /*! 
  * @preserve
  * xml_parser.js by TinyVirtual; 
- * All Rights Reserved; 
  * Version: v0.2.4a (prealpha); 
  * Git @ https://github.com/TinyVirtual/NodeModules.git;
  * See repo for more details;
  * Please credit if u liek cookie :3
-*/
-/*
- * xml_parser.js@0.2.4a by TinyVirtual
- * This is the unminified version of the file
- * Merge requests are always welcome (if we have)
- * Notice: this still needs to be written
- * If you want to fork this project and make your own version, please give credits to original version 
- * ...
 */
 /**
  * Escape a string with XAML encoding
@@ -256,6 +252,7 @@ class XmlElement {
         this.tag = tag
         this.attributes = (attributes ?? []).length?[...attributes]:[]
         this.content = ''
+        this.type = "Element"
         this.selfClosing = false
         this.isHtml = false
         this.children = []
@@ -505,6 +502,7 @@ class HtmlElement extends XmlElement {
      */
     constructor(...sup){
         super(...sup)
+        this.type = "ElementHTML"
     }
 
     /**
@@ -611,6 +609,7 @@ class XmlDocument {
     constructor(children) {
         this.documentTags = []
         this.children = []
+        this.type = "XmlDocument"
         this.parent = null
         this.identated = false
 
@@ -621,8 +620,7 @@ class XmlDocument {
 
     toJsonStruc = function(){
         return {
-            children: this.children.map(l=>l.toJsonStruc()),
-            documentTags: []
+            children: this.children.map(l=>l.toJsonStruc())
         }
     }
 
@@ -679,7 +677,12 @@ class XmlDocument {
         return childs
     }
 }
-
+/**
+ * Turns a XML string into a XML structure
+ * @param {string} xml - The XML String
+ * @param {{preserveBlank: boolean, isHtml: boolean}} settings - Aditional Settings
+ * @returns {XmlDocument}
+ */
 function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
     let pover = 0
     let depth = 0
@@ -925,13 +928,12 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                 }
             }
         } else {
+
+            //console.log(realTag+'',attributes,selfClosing)
             let xml_elemt = new constr(realTag,attributes,active,[])
             xml_elemt.isRaw = !preserveBlank
             xml_elemt.selfClosing = true
             xml_elemt.isHtml = isHtml
-            if(depth == 1){
-                doc.appendChild(xml_elemt)
-            }
             let content = tag.splice(1).join('')
             if(content) {
                 if(!preserveBlank){
@@ -949,7 +951,13 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
     }
     return doc
 }
-
+/**
+ * Ident a unidented XML (when not preserving spaces)
+ * @param {string} xml - Xml String
+ * @param {number} identation - How many spaces
+ * @param {{lineEnding: string}} config - Aditional Settings
+ * @returns 
+ */
 function indentXml(xml,identation=4,config={}){
 
     let xovial = xml.trim().split('<').filter(l=>!!(l.trim())).map(k=>'<'+k)
