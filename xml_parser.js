@@ -594,6 +594,35 @@ class HtmlElement extends XmlElement {
     set style (style){
         this.setAttribute('style',style)
     }
+
+    get innerHTML (){
+        return this.children.map(c=>c.toString()).join('')
+    }
+    set innerHTML (html){
+        try {
+            let toSet = xmlToElement(html,{isHtml:true})
+            this.children = toSet.children
+        } catch(e) {
+            console.error(e.message)
+            throw e
+        }
+    }
+
+    get innerText (){
+        return this.children.map(c=>{
+            if(c.type=="TextNode"){
+                return c.content
+            } else if(c.type.includes("Element")){
+                return c.innerText
+            } else {
+                return ""
+            }
+        }).join("")
+    }
+
+    set innerText (text){
+        this.children = [new XmlTextNode(text)]
+    }
 }
 
 let htmlEnclose = [
