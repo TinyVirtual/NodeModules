@@ -241,6 +241,13 @@ class XmlInstructions {
 }
 
 class QueryParams {
+    /**
+     * 
+     * @param {string|undefined} tag Target tags
+     * @param {string|string[]|undefined} classes Target classes
+     * @param {string|undefined} id Target Element ID
+     * @param {XmlAttributes[]|undefined} attr Target Attributes
+     */
     constructor(tag,classes,id,attr){
         this.tag = tag
         this.classes = classes
