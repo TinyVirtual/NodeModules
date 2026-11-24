@@ -240,6 +240,15 @@ class XmlInstructions {
     }
 }
 
+class QueryParams {
+    constructor(tag,classes,id,attr){
+        this.tag = tag
+        this.classes = classes
+        this.id = id
+        this.attr = attr
+    }
+}
+
 class XmlElement {
     /**
      * Creates a new XML element
@@ -697,19 +706,19 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
 
     let constr = isHtml?HtmlElement:XmlElement
 
-    let xovial = xml.split('<').filter(l=>!!(l.trim())).map(k=>'<'+k)
+    let xmlSplitted = xml.split('<').filter(l=>!!(l.trim())).map(k=>'<'+k)
     xml = ''
 
-    xovial = xovial.filter(Boolean)
+    xmlSplitted = xmlSplitted.filter(Boolean)
 
-    mainNoverLoop:
-    for(let nover in xovial){
-        let og = xovial[+nover][preserveBlank?"trimStart":"trim"]()
-        if(!og){
-            xovial[+nover] = ''
+    mainParsingLoop:
+    for(let xmlsIndex in xmlSplitted){
+        let xmlPiece = xmlSplitted[+xmlsIndex][preserveBlank?"trimStart":"trim"]()
+        if(!xmlPiece){
+            xmlSplitted[+xmlsIndex] = ''
             continue
         }
-        let tag = og[preserveBlank?"trimStart":"trim"]().split('>').map((k,i,j)=>((i!=j.length-1)?(k+'>'):k)).filter(Boolean)
+        let tag = xmlPiece[preserveBlank?"trimStart":"trim"]().split('>').map((k,i,j)=>((i!=j.length-1)?(k+'>'):k)).filter(Boolean)
         let realTag = tag[0].match(/(?<=<([\s]*[/])?[\s]*)[\w:\._-]+(?=[\s\/>])/u)?.[0]
         let attributes = [...tag[0].matchAll(attributeRegexp)].map(k=>new XmlAttributes(k[1],
             (typeof k[2] == 'string')?
@@ -732,7 +741,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                 let textElement = new XmlTextNode(content);
                 (active||doc).appendChild(textElement)
             }
-            xovial[+nover] = ''
+            xmlSplitted[+xmlsIndex] = ''
             continue
         }
         /*
@@ -749,14 +758,14 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
             }
             continue
         }
-        if(og.startsWith('<![CDATA[')){
+        if(xmlPiece.startsWith('<![CDATA[')){
             let overs = []
-            for(let _yover = nover; _yover < xovial.length; _yover++){
-                let goover = xovial[_yover]
+            for(let _yover = xmlsIndex; _yover < xmlSplitted.length; _yover++){
+                let goover = xmlSplitted[_yover]
                 overs.push(goover.split(']]>')[0]+']]>')
-                xovial[_yover] = ''
+                xmlSplitted[_yover] = ''
                 if(goover.includes(']]>')){
-                    xovial[_yover] = '';
+                    xmlSplitted[_yover] = '';
 
                     (active||doc).appendChild(new XmlCDATA(overs.join('\n').replaceAll(']]>','').replaceAll('<![CDATA[','')))
 
@@ -776,14 +785,14 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
 
 
         for(let kon of rawNodes){
-            if(og.startsWith(kon[1][0])){
+            if(xmlPiece.startsWith(kon[1][0])){
                 let overs = []
-                for(let _yover = nover; _yover < xovial.length; _yover++){
-                    let goover = xovial[_yover]
+                for(let _yover = xmlsIndex; _yover < xmlSplitted.length; _yover++){
+                    let goover = xmlSplitted[_yover]
                     overs.push(goover.split(kon[1][1])[0]+kon[1][1])
-                    xovial[_yover] = ''
+                    xmlSplitted[_yover] = ''
                     if(goover.includes(kon[1][1])){
-                        xovial[_yover] = '';
+                        xmlSplitted[_yover] = '';
                         let kment = new kon[0](overs.join('').replaceAll(kon[1][1],'').replaceAll(kon[1][0],''));
 
                         (active||doc).appendChild(kment)
@@ -795,8 +804,8 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                         }
                         
 
-                        xovial[+nover] = ''
-                        continue mainNoverLoop
+                        xmlSplitted[+xmlsIndex] = ''
+                        continue mainParsingLoop
                     }
                 }
             }
@@ -806,12 +815,12 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
 
         for(let scron of rawTags){
             let rgxp = rawTagsRegxp[scron].start
-            if(rgxp.test(og)){
+            if(rgxp.test(xmlPiece)){
                 let overs = []
                 let endRgxp = rawTagsRegxp[scron].end
                 
-                for(let _yover = nover; _yover < xovial.length; _yover++){
-                    let goover = xovial[_yover]
+                for(let _yover = xmlsIndex; _yover < xmlSplitted.length; _yover++){
+                    let goover = xmlSplitted[_yover]
                     overs.push(goover)
                     if(goover.match(endRgxp)){
                         overs = overs.filter(l=>!endRgxp.test(l)).map(l=>l.replace(rawTagsRegxp[scron].head,''))
@@ -830,10 +839,10 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                         }
                         //if(overs.length>1){
                         //console.log(scrChl.toString())}
-                        xovial[+_yover] = ''
-                        continue mainNoverLoop
+                        xmlSplitted[+_yover] = ''
+                        continue mainParsingLoop
                     } else {
-                        xovial[+_yover] = ''
+                        xmlSplitted[+_yover] = ''
                     }
                 }
 
@@ -860,7 +869,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                 (active||doc).appendChild(textElement)
             }
 
-            xovial[+nover] = ''
+            xmlSplitted[+xmlsIndex] = ''
             continue
         }
 
@@ -943,7 +952,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
                 active.appendChild(textElement)
             }
         }
-        xovial[+nover] = ''
+        xmlSplitted[+xmlsIndex] = ''
         //console.log('  '.repeat(depth)+(" /"[+isClosing])+realTag+(" /"[+selfClosing]),depth)
     }
     if(depth < 1){
@@ -960,7 +969,7 @@ function xmlToElement(xml,settings={preserveBlank:true,isHtml:false}){
  */
 function indentXml(xml,identation=4,config={}){
 
-    let xovial = xml.trim().split('<').filter(l=>!!(l.trim())).map(k=>'<'+k)
+    let xmlSplitted = xml.trim().split('<').filter(l=>!!(l.trim())).map(k=>'<'+k)
     let depth = 0
     let pover = 0
     let ln = '\n'
@@ -991,19 +1000,19 @@ function indentXml(xml,identation=4,config={}){
         }
     }
     
-    xovial = xovial.filter(Boolean)
+    xmlSplitted = xmlSplitted.filter(Boolean)
 
     let mapol = []
 
 
-    for(let nover in xovial){
-        let og = xovial[+nover]
-        let tag = og.trim().split('>').map((k,i,j)=>((i!=j.length-1)?(k+'>'):k)).filter(Boolean)
+    for(let xmlsIndex in xmlSplitted){
+        let xmlPiece = xmlSplitted[+xmlsIndex]
+        let tag = xmlPiece.trim().split('>').map((k,i,j)=>((i!=j.length-1)?(k+'>'):k)).filter(Boolean)
         let realTag = tag[0].match(/(?<=<([\s]*[/])?[\s]*)[\w:\._-]+(?=[\s\/>])/u)?.[0]
         
         for(let scron of rawTags){
             let rgxp = rawTagsRegxp[scron].start
-            if(rgxp.test(og)){
+            if(rgxp.test(xmlPiece)){
                 tag.map((k,i)=>((i)?(k+'>'):k))
             }
         }
@@ -1011,7 +1020,7 @@ function indentXml(xml,identation=4,config={}){
         let vaqbra = true
 
         if(tag[0].startsWith('<!') || tag[0].startsWith('<?')){
-            mapol.push(ln+' '.repeat(((depth>0)?depth:0)*identation)+og+'')
+            mapol.push(ln+' '.repeat(((depth>0)?depth:0)*identation)+xmlPiece+'')
             continue
         }
 
@@ -1042,7 +1051,7 @@ function indentXml(xml,identation=4,config={}){
 
         if(tag[0].startsWith('</')){
             depth = pover+1
-            if(!xovial[(+nover)-1].endsWith('>') && !rawTags.includes(realTag)){
+            if(!xmlSplitted[(+xmlsIndex)-1].endsWith('>') && !rawTags.includes(realTag)){
                 vaqbra = false
             }
         } else {
@@ -1053,7 +1062,7 @@ function indentXml(xml,identation=4,config={}){
             depth++
         }
         try {
-            mapol.push((vaqbra?ln+(' '.repeat(((depth>0)?(depth-1):0)*identation)):'')+og)
+            mapol.push((vaqbra?ln+(' '.repeat(((depth>0)?(depth-1):0)*identation)):'')+xmlPiece)
         } catch(e) {
             e.message += '\n\n\twith depth='+depth+' and identation='+identation+';'
             throw e
